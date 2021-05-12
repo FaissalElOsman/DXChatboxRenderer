@@ -1,0 +1,80 @@
+import rainbowSDK from './rainbow-sdk.min.js';
+var context = {};
+var settings = {
+    "url": "{{$URL}}/dxChatboxRenderer/guestRainbowAccount",
+    "method": "GET",
+    "timeout": 0,
+};
+
+var onLoaded = function onLoaded() {
+    console.log('[Hello World] :: On SDK Loaded !');
+
+    rainbowSDK.initialize(context["appID"], context["appSecret"])
+    .then(() => {
+        console.log('[Hello World] :: Rainbow SDK is initialized!');
+    })
+    .catch(err => {
+        console.log('[Hello World] :: Something went wrong with the SDK.', err);
+    });
+};
+
+var onReady = function onReady() {
+    // The SDK for Web is ready to be used, so you can sign in
+    rainbowSDK.connection.signin(context["login"], context["password"])
+    .then(function(account) {
+        rainbowSDK.conversations.getConversationByContactId(context["ownerID"]).then(_conversation => {
+            context["conversationID"] = _conversation.id;
+            console.log('conversation established');
+        }).catch(function(err) {
+            console.log(err);
+        });
+    })
+    .catch(function(err) {
+        console.log('onReady Error');
+    });
+};
+
+$('#chatEnter').click(function(evt) {
+    $("#chat-content").append(`
+      <div class="media media-chat media-chat-reverse">
+        <div class="media-body">
+          <p>` + document.getElementById("chatInput").value + `</p>
+          </div>
+        </div>
+    `);
+    rainbowSDK.im.sendMessageToConversation(context["conversationID"] , document.getElementById("chatInput").value);
+    document.getElementById("chatInput").value = "";
+});
+
+$(document).ready(function(){
+    $('#chatInput').keypress(function(e){
+      if(e.keyCode==13)
+      $('#chatEnter').click();
+    });
+});
+
+let onNewMessageReceived = function(event) {
+    let message = event.detail.message;
+
+    $("#chat-content").append(`
+    <div class="media media-chat">
+      <div class="media-body">
+        <p>` + message.data + `</p>
+        </div>
+      </div>
+  `);
+};
+
+document.addEventListener(rainbowSDK.im.RAINBOW_ONNEWIMMESSAGERECEIVED, onNewMessageReceived)
+document.addEventListener(rainbowSDK.RAINBOW_ONREADY, onReady);
+document.addEventListener(rainbowSDK.RAINBOW_ONLOADED, onLoaded);
+
+$.ajax(settings).done(function (response) {
+    context["login"] = response["login"];
+    context["password"] = response["password"];
+    context["appID"] = response["appID"];
+    context["appSecret"] = response["appSecret"];
+    context["ownerID"] = response["ownerID"];
+    rainbowSDK.start();
+    rainbowSDK.load();
+});

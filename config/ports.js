@@ -1,0 +1,6 @@
+module.exports.DX_WHATSAPP_GATEWAY_PORT = 3000;
+module.exports.DX_RAINBOW_GATEWAY_PORT = 3100;
+module.exports.DX_MESSENGER_GATEWAY_PORT = 3200;
+module.exports.DX_STATE_MACHINE_PORT = 3300;
+module.exports.DX_HANDOVER_MANAGER = 3400;
+module.exports.DX_CHATBOX_RENDERER = 3500;
