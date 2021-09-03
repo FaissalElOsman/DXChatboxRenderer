@@ -75,6 +75,7 @@ $.ajax(settings).done(function (response) {
     context["appID"] = response["appID"];
     context["appSecret"] = response["appSecret"];
     context["ownerID"] = response["ownerID"];
+    context["ownerID"] = '60a92986b62cbe36634cac93';
     rainbowSDK.start();
     rainbowSDK.load();
 });
